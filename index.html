@@ -1,0 +1,1505 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Generátor slovních úloh na procenta</title>
+    <style>
+        /* ==========================================================================
+           1. ZERO DEPENDENCY MODERN CSS STYLES & MOBILITY OPTIMIZATIONS
+           ========================================================================== */
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --primary-dark: #312e81;
+            --primary-light: #e0e7ff;
+            --secondary: #0284c7;
+            --success: #10b981;
+            --success-dark: #059669;
+            --success-light: #d1fae5;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --bg-main: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
+            line-height: 1.5;
+        }
+
+        /* Prevent auto-zoom on iOS Safari: minimum 16px font-size on all inputs */
+        input[type="text"], input[type="number"], select, button {
+            font-size: 16px !important;
+            touch-action: manipulation;
+        }
+
+        /* Header */
+        header {
+            background-color: var(--primary-dark);
+            color: #ffffff;
+            padding: 12px 16px;
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            box-shadow: var(--shadow-md);
+        }
+
+        .header-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .brand-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-icon {
+            background-color: var(--primary);
+            color: #fde047;
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 20px;
+        }
+
+        .brand-text h1 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .brand-text p {
+            font-size: 0.75rem;
+            color: var(--primary-light);
+        }
+
+        .student-badge {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: #ffffff;
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .header-controls {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .lang-switch {
+            display: flex;
+            background: rgba(0, 0, 0, 0.25);
+            padding: 3px;
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .lang-btn {
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .lang-btn.active {
+            background-color: var(--warning);
+            color: var(--text-main);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-weight: 700;
+            padding: 10px 16px;
+            border-radius: var(--radius-md);
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            box-shadow: var(--shadow-sm);
+            min-height: 44px;
+        }
+
+        .btn:active { transform: scale(0.98); }
+        .btn-primary { background-color: var(--primary); color: #ffffff; }
+        .btn-success { background-color: var(--success); color: #ffffff; }
+        .btn-warning { background-color: var(--warning); color: var(--text-main); }
+        .btn-secondary { background-color: #e2e8f0; color: var(--text-main); }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        main {
+            max-width: 1100px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 16px;
+            flex-grow: 1;
+        }
+
+        .tabs-container {
+            display: flex;
+            background-color: var(--card-bg);
+            padding: 4px;
+            border-radius: var(--radius-md);
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary-light);
+            color: var(--primary-dark);
+        }
+
+        .grid-dashboard {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .grid-dashboard { grid-template-columns: 3fr 1fr; }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .filter-group {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        @media (min-width: 500px) {
+            .filter-group { grid-template-columns: 1fr 1fr; }
+        }
+
+        .form-control {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-control label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        select, input[type="text"] {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: var(--radius-md);
+            border: 1.5px solid var(--border-color);
+            background-color: #ffffff;
+            color: var(--text-main);
+            font-weight: 600;
+            outline: none;
+        }
+
+        .scoreboard {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .score-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin: 8px 0;
+        }
+
+        .score-val { font-size: 2rem; font-weight: 900; }
+
+        .progress-bar-bg {
+            background: rgba(0, 0, 0, 0.3);
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-bar-fill {
+            background: linear-gradient(90deg, var(--warning), var(--success));
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .problem-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+        }
+
+        .problem-header {
+            background-color: #f1f5f9;
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-diff { background: var(--primary-light); color: var(--primary-dark); }
+        .badge-type { background: #e2e8f0; color: var(--text-main); }
+
+        .problem-body {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .problem-box {
+            background-color: var(--bg-main);
+            padding: 20px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            font-size: 1.15rem;
+            font-weight: 600;
+            line-height: 1.6;
+        }
+
+        .input-row {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        @media (min-width: 600px) {
+            .input-row { flex-direction: row; }
+        }
+
+        .input-wrapper {
+            position: relative;
+            flex-grow: 1;
+        }
+
+        .input-unit {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-weight: 700;
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+
+        .alert {
+            padding: 14px 18px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            display: none;
+        }
+
+        .alert-success { background-color: var(--success-light); color: #065f46; border: 1px solid #a7f3d0; }
+        .alert-danger { background-color: var(--danger-light); color: #991b1b; border: 1px solid #fecaca; }
+        .alert-warning { background-color: var(--warning-light); color: #92400e; border: 1px solid #fde68a; }
+
+        .solution-box {
+            border-top: 1px dashed var(--border-color);
+            padding-top: 16px;
+            display: none;
+        }
+
+        .solution-title {
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--primary-dark);
+        }
+
+        .step-item {
+            background: #f1f5f9;
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 6px;
+            font-family: monospace;
+            font-size: 0.95rem;
+        }
+
+        /* Worksheet Styles */
+        .worksheet-controls {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        @media (min-width: 600px) {
+            .worksheet-controls { grid-template-columns: 1fr 1fr 1fr; }
+        }
+
+        .worksheet-paper {
+            background: #ffffff;
+            padding: 32px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
+        }
+
+        .ws-header {
+            border-bottom: 2px solid var(--text-main);
+            padding-bottom: 12px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .ws-title { font-size: 1.4rem; font-weight: 900; text-transform: uppercase; }
+        .ws-meta { text-align: right; font-size: 0.85rem; }
+
+        .ws-problem-item {
+            background: #fafafa;
+            border: 1px solid var(--border-color);
+            padding: 14px 18px;
+            border-radius: var(--radius-md);
+            margin-bottom: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .ws-answer-line {
+            text-align: right;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            border-top: 1px dashed #cbd5e1;
+            padding-top: 8px;
+        }
+
+        /* Modal windows */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .modal-card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 500px;
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+        }
+
+        .modal-title { font-size: 1.2rem; font-weight: 800; }
+
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .stats-table th, .stats-table td {
+            padding: 10px;
+            border-bottom: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .stats-table th { background: #f1f5f9; font-weight: 700; }
+        .hidden { display: none !important; }
+
+        @media print {
+            header, .tabs-container, .worksheet-controls, .no-print { display: none !important; }
+            body { background: #ffffff !important; color: #000000 !important; }
+            main { padding: 0 !important; max-width: 100% !important; }
+            .worksheet-paper { border: none !important; box-shadow: none !important; padding: 0 !important; }
+            .ws-problem-item { background: #ffffff !important; border: 1px solid #666 !important; break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navbar -->
+    <header class="no-print">
+        <div class="header-container">
+            <div class="brand-section">
+                <div class="brand-icon">%</div>
+                <div class="brand-text">
+                    <h1 id="ui-title">Slovní úlohy na procenta</h1>
+                    <p id="ui-subtitle">Procvičování & Generátor pracovních listů</p>
+                </div>
+            </div>
+
+            <button class="student-badge" onclick="openStudentModal()">
+                <span>👤</span>
+                <span id="nav-student-name">Žák: ---</span>
+            </button>
+
+            <div class="header-controls">
+                <div class="lang-switch">
+                    <button onclick="setLanguage('cs')" id="lang-btn-cs" class="lang-btn active">CS</button>
+                    <button onclick="setLanguage('uk')" id="lang-btn-uk" class="lang-btn">UK</button>
+                    <button onclick="setLanguage('en')" id="lang-btn-en" class="lang-btn">EN</button>
+                    <button onclick="setLanguage('tl')" id="lang-btn-tl" class="lang-btn">TL</button>
+                </div>
+
+                <button onclick="downloadAppHtml()" class="btn btn-success" style="font-size: 0.8rem; padding: 6px 12px; min-height: 36px;">
+                    💾 <span id="ui-btn-save-app">Uložit aplikaci</span>
+                </button>
+
+                <button onclick="openFinishModal()" class="btn btn-warning" style="font-size: 0.8rem; padding: 6px 12px; min-height: 36px;">
+                    ✉️ <span id="ui-btn-finish">Ukončit a odeslat</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Mode Tabs -->
+        <div class="tabs-container no-print">
+            <button id="tab-practice" onclick="switchMode('practice')" class="tab-btn active">
+                💻 <span id="ui-tab-practice">Interaktivní procvičování</span>
+            </button>
+            <button id="tab-worksheet" onclick="switchMode('worksheet')" class="tab-btn">
+                🖨️ <span id="ui-tab-worksheet">Pracovní list k tisku</span>
+            </button>
+        </div>
+
+        <!-- Mode 1: Practice -->
+        <div id="mode-practice">
+            <div class="grid-dashboard">
+                <div class="card">
+                    <div class="filter-group">
+                        <div class="form-control">
+                            <label id="ui-label-type">Typ úlohy</label>
+                            <select id="select-problem-type" onchange="generateNewProblem()">
+                                <option value="all" id="opt-type-all">Všechny typy (Mix)</option>
+                                <option value="part" id="opt-type-part">Výpočet procentové části (Část)</option>
+                                <option value="base" id="opt-type-base">Výpočet základu (100 %)</option>
+                                <option value="rate" id="opt-type-rate">Výpočet počtu procent (%)</option>
+                                <option value="compound" id="opt-type-compound">Složené změny (Zvýšení / Snížení)</option>
+                            </select>
+                        </div>
+                        <div class="form-control">
+                            <label id="ui-label-diff">Obtížnost</label>
+                            <select id="select-difficulty" onchange="generateNewProblem()">
+                                <option value="easy" id="opt-diff-easy">Lehká (Základní 10%, 20%, 50%)</option>
+                                <option value="medium" id="opt-diff-medium" selected>Střední (Běžná procenta)</option>
+                                <option value="hard" id="opt-diff-hard">Těžká (Složitější příklady)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card scoreboard">
+                    <div style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase;" id="ui-score-title">Skóre a série</div>
+                    <div class="score-row">
+                        <div>
+                            <span class="score-val" id="stat-score">0</span>
+                            <span style="font-size: 0.8rem;" id="ui-pts">bodů</span>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 1.2rem; font-weight: 800; color: #fde047;">🔥 <span id="stat-streak">0</span></div>
+                            <span style="font-size: 0.75rem;" id="ui-streak">série</span>
+                        </div>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div id="stat-progress-bar" class="progress-bar-fill"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Problem display -->
+            <div class="problem-card">
+                <div class="problem-header">
+                    <div style="display: flex; gap: 8px;">
+                        <span id="badge-difficulty" class="badge badge-diff">STŘEDNÍ</span>
+                        <span id="badge-type" class="badge badge-type">ČÁST</span>
+                    </div>
+                    <button onclick="generateNewProblem()" class="btn btn-secondary" style="font-size: 0.8rem; padding: 4px 10px; min-height: 32px;">
+                        🔄 <span id="ui-btn-new-problem">Další úloha</span>
+                    </button>
+                </div>
+
+                <div class="problem-body">
+                    <div class="problem-box" id="problem-text">Načítám úlohu...</div>
+
+                    <form onsubmit="handleFormSubmit(event)" class="input-row">
+                        <div class="input-wrapper">
+                            <input type="text" id="input-answer" placeholder="Zadejte výsledek..." autocomplete="off">
+                            <span id="input-unit" class="input-unit"></span>
+                        </div>
+                        <button type="submit" id="btn-check" class="btn btn-primary">
+                            ✓ <span id="ui-btn-check">Zkontrolovat</span>
+                        </button>
+                        <button type="button" onclick="toggleHint()" class="btn btn-secondary">
+                            💡 <span id="ui-btn-hint">Nápověda</span>
+                        </button>
+                    </form>
+
+                    <div id="feedback-box" class="alert"></div>
+
+                    <div id="hint-box" class="alert alert-warning">
+                        <strong id="ui-hint-heading">Nápověda k výpočtu:</strong>
+                        <p id="hint-text" style="margin-top: 4px; font-weight: 500;"></p>
+                    </div>
+
+                    <div id="solution-box" class="solution-box">
+                        <div class="solution-title" id="ui-solution-heading">Podrobný postup řešení:</div>
+                        <div id="solution-steps"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mode 2: Printable Worksheet -->
+        <div id="mode-worksheet" class="hidden">
+            <div class="worksheet-controls no-print">
+                <div class="form-control">
+                    <label id="ui-ws-count">Počet úloh</label>
+                    <select id="select-ws-count">
+                        <option value="5">5 příkladů</option>
+                        <option value="10" selected>10 příkladů</option>
+                        <option value="15">15 příkladů</option>
+                        <option value="20">20 příkladů</option>
+                    </select>
+                </div>
+                <div class="form-control">
+                    <label id="ui-ws-diff">Obtížnost</label>
+                    <select id="select-ws-diff">
+                        <option value="easy">Lehká</option>
+                        <option value="medium" selected>Střední</option>
+                        <option value="hard">Těžká</option>
+                        <option value="mixed">Smíšená</option>
+                    </select>
+                </div>
+                <div style="display: flex; align-items: flex-end; gap: 8px; margin-top: auto;">
+                    <button onclick="generateWorksheet()" class="btn btn-primary" style="flex: 1;">
+                        🪄 <span id="ui-btn-ws-generate">Vygenerovat</span>
+                    </button>
+                    <button onclick="window.print()" class="btn btn-success">
+                        🖨️ <span id="ui-btn-ws-print">Vytisknout</span>
+                    </button>
+                </div>
+                <div style="grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; margin-top: 4px;">
+                    <input type="checkbox" id="check-show-answers" onchange="toggleWorksheetAnswers()" style="width: 18px; height: 18px;">
+                    <label for="check-show-answers" id="ui-ws-show-keys" style="font-size: 0.9rem; font-weight: 600; cursor: pointer;">Zobrazit klíč správných odpovědí na konci</label>
+                </div>
+            </div>
+
+            <div class="worksheet-paper">
+                <div class="ws-header">
+                    <div>
+                        <div class="ws-title" id="ui-ws-header-title">Pracovní list: Procenta</div>
+                        <div style="font-size: 0.85rem; color: var(--text-muted);">ZŠ Gajdošova • Matematika</div>
+                    </div>
+                    <div class="ws-meta">
+                        <div><strong id="ui-ws-label-name">Jméno:</strong> <span id="ws-student-name" style="font-weight: 700;">________________</span></div>
+                        <div><strong id="ui-ws-label-class">Třída:</strong> <span id="ws-student-class" style="font-weight: 700;">________</span></div>
+                        <div><strong id="ui-ws-label-date">Datum:</strong> <span id="ws-date">____________</span></div>
+                    </div>
+                </div>
+
+                <div id="worksheet-list"></div>
+
+                <div id="worksheet-answers" class="hidden" style="border-top: 2px dashed #94a3b8; margin-top: 30px; padding-top: 20px;">
+                    <h3 style="text-transform: uppercase; margin-bottom: 12px; color: var(--primary-dark);" id="ui-ws-key-title">Klíč správných výsledků</h3>
+                    <div id="worksheet-answers-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; font-family: monospace;"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Student Login Modal -->
+    <div id="modal-student" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title" id="ui-modal-stu-title">Identifikace žáka</div>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-muted);" id="ui-modal-stu-sub">Zadejte své údaje pro vyhodnocení</p>
+            <form onsubmit="saveStudentInfo(event)" style="display: flex; flex-direction: column; gap: 14px;">
+                <div class="form-control">
+                    <label id="ui-modal-lbl-name">Jméno a příjmení *</label>
+                    <input type="text" id="input-student-name" required placeholder="Např. Jan Novák">
+                </div>
+                <div class="form-control">
+                    <label id="ui-modal-lbl-class">Třída *</label>
+                    <input type="text" id="input-student-class" required placeholder="Např. 7.A">
+                </div>
+                <button type="submit" class="btn btn-primary" style="margin-top: 8px;">
+                    <span id="ui-modal-btn-save">Uložit a pokračovat</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Finish Stats Modal -->
+    <div id="modal-finish" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title" id="ui-modal-fin-title">Přehled výsledků</div>
+                <button onclick="closeFinishModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">✕</button>
+            </div>
+            <div id="modal-fin-student-info" style="font-weight: 700; color: var(--primary-dark);">Žák: ---</div>
+            
+            <table class="stats-table">
+                <thead>
+                    <tr>
+                        <th id="ui-th-diff">Obtížnost</th>
+                        <th id="ui-th-attempts">Pokusy</th>
+                        <th id="ui-th-correct">Správně</th>
+                        <th id="ui-th-acc">Úspěšnost</th>
+                    </tr>
+                </thead>
+                <tbody id="stats-table-body"></tbody>
+            </table>
+
+            <div style="background: var(--primary-light); padding: 14px; border-radius: var(--radius-md); display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-weight: 700; color: var(--primary-dark);" id="ui-total-score-label">Celkové skóre:</span>
+                <span id="final-total-score" style="font-size: 1.4rem; font-weight: 900; color: var(--primary);">0 bodů</span>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <button onclick="sendMailToTeacher()" class="btn btn-success">
+                    ✉️ <span id="ui-btn-send-email">Odeslat výsledky e-mailem učiteli</span>
+                </button>
+                <button onclick="copyResultsToClipboard()" class="btn btn-secondary">
+                    📋 <span id="ui-btn-copy-stats">Zkopírovat výsledky do schránky</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script executes synchronously directly before closing body -->
+    <script>
+        // Memory fallback to prevent iOS Private Browsing / WebKit SecurityError crash
+        var MEMORY_STORAGE = {};
+        function safeGetStorage(key) {
+            try {
+                if (window.localStorage) return window.localStorage.getItem(key);
+            } catch (e) {}
+            return MEMORY_STORAGE[key] || null;
+        }
+        function safeSetStorage(key, val) {
+            try {
+                if (window.localStorage) {
+                    window.localStorage.setItem(key, val);
+                    return;
+                }
+            } catch (e) {}
+            MEMORY_STORAGE[key] = val;
+        }
+
+        var STATE = {
+            lang: 'cs',
+            mode: 'practice',
+            student: { name: '', class: '' },
+            score: 0,
+            streak: 0,
+            stats: {
+                easy: { attempts: 0, correct: 0 },
+                medium: { attempts: 0, correct: 0 },
+                hard: { attempts: 0, correct: 0 }
+            },
+            currentProblem: null,
+            worksheetData: []
+        };
+
+        var TRANSLATIONS = {
+            cs: {
+                title: "Slovní úlohy na procenta", subtitle: "Procvičování & Generátor pracovních listů",
+                saveApp: "Uložit aplikaci", finish: "Ukončit a odeslat",
+                tabPractice: "Interaktivní procvičování", tabWorksheet: "Pracovní list k tisku",
+                labelType: "Typ úlohy", labelDiff: "Obtížnost", scoreTitle: "Skóre a série",
+                pts: "bodů", streak: "série",
+                typeAll: "Všechny typy (Mix)", typePart: "Výpočet procentové části (Část)",
+                typeBase: "Výpočet základu (100 %)", typeRate: "Výpočet počtu procent (%)",
+                typeCompound: "Složené změny (Zvýšení / Snížení)",
+                diffEasy: "Lehká (Základní 10%, 20%, 50%)", diffMedium: "Střední (Běžná procenta)", diffHard: "Těžká (Složitější příklady)",
+                btnNewProblem: "Další úloha", btnCheck: "Zkontrolovat", btnSolved: "Vyřešeno ✓", btnHint: "Nápověda",
+                hintHeading: "Nápověda k výpočtu:", solutionHeading: "Podrobný postup řešení:", inputPlaceholder: "Zadejte výsledek...",
+                wsCount: "Počet úloh", wsDiff: "Obtížnost", btnWsGenerate: "Vygenerovat", btnWsPrint: "Vytisknout",
+                wsShowKeys: "Zobrazit klíč správných odpovědí na konci", wsHeaderTitle: "Pracovní list: Procenta",
+                wsLabelName: "Jméno:", wsLabelClass: "Třída:", wsLabelDate: "Datum:", wsKeyTitle: "Klíč správných výsledků",
+                modalStuTitle: "Identifikace žáka", modalStuSub: "Zadejte své údaje pro vyhodnocení",
+                modalLblName: "Jméno a příjmení *", modalLblClass: "Třída *", modalBtnSave: "Uložit a pokračovat",
+                modalFinTitle: "Přehled výsledků", thDiff: "Obtížnost", thAttempts: "Pokusy", thCorrect: "Správně", thAcc: "Úspěšnost",
+                totalScoreLabel: "Celkové skóre:", btnSendEmail: "Odeslat výsledky e-mailem učiteli", btnCopyStats: "Zkopírovat výsledky do schránky",
+                correctMsg: "Výborně! Vaše odpověď je správná. (+10 bodů)",
+                incorrectMsg: "Bohužel, toto není správně. Zkuste to znovu nebo nahlédněte do nápovědy.",
+                alreadySolvedMsg: "Tuto úlohu jste již úspěšně vyřešili. Klikněte na 'Další úloha'.",
+                copiedMsg: "Výsledky byly úspěšně zkopírovány do schránky!"
+            },
+            uk: {
+                title: "Текстові задачі на відсотки", subtitle: "Практика та Генератор робочих аркушів",
+                saveApp: "Зберегти додаток", finish: "Завершити та надіслати",
+                tabPractice: "Інтерактивна практика", tabWorksheet: "Робочий аркуш для друку",
+                labelType: "Тип задачі", labelDiff: "Складність", scoreTitle: "Рахунок та серія",
+                pts: "балів", streak: "серія",
+                typeAll: "Усі типи (Мікс)", typePart: "Обчислення відсоткової частини",
+                typeBase: "Обчислення основи (100%)", typeRate: "Обчислення відсотка (%)",
+                typeCompound: "Складні зміни (Збільшення / Зменшення)",
+                diffEasy: "Легка (Основні 10%, 20%, 50%)", diffMedium: "Середня (Ззвичайні відсотки)", diffHard: "Важка (Складніші задачі)",
+                btnNewProblem: "Наступна задача", btnCheck: "Перевірити", btnSolved: "Розв'язано ✓", btnHint: "Підказка",
+                hintHeading: "Підказка до розв'язання:", solutionHeading: "Покроковий хід розв'язання:", inputPlaceholder: "Введіть відповідь...",
+                wsCount: "Кількість задач", wsDiff: "Складність", btnWsGenerate: "Згенерувати", btnWsPrint: "Друкувати",
+                wsShowKeys: "Показати ключі відповідей наприкінці", wsHeaderTitle: "Робочий аркуш: Відсотки",
+                wsLabelName: "Ім'я:", wsLabelClass: "Клас:", wsLabelDate: "Дата:", wsKeyTitle: "Ключ правильних відповідей",
+                modalStuTitle: "Ідентифікація учня", modalStuSub: "Введіть свої дані для оцінювання",
+                modalLblName: "Прізвище та ім'я *", modalLblClass: "Клас *", modalBtnSave: "Зберегти та продовжити",
+                modalFinTitle: "Огляд результатів", thDiff: "Складність", thAttempts: "Спроби", thCorrect: "Правильно", thAcc: "Успішність",
+                totalScoreLabel: "Загальний рахунок:", btnSendEmail: "Надіслати результати вчителю", btnCopyStats: "Скопіювати результати в буфер",
+                correctMsg: "Чудово! Ваша відповідь правильна. (+10 балів)",
+                incorrectMsg: "На жаль, це неправильно. Спробуйте ще раз або перегляньте підказку.",
+                alreadySolvedMsg: "Ви вже розв'язали цю задачу. Натисніть 'Наступна задача'.",
+                copiedMsg: "Результати успішно скопійовано!"
+            },
+            en: {
+                title: "Percentage Word Problems", subtitle: "Practice & Printable Worksheet Generator",
+                saveApp: "Save App", finish: "Finish & Send",
+                tabPractice: "Interactive Practice", tabWorksheet: "Printable Worksheet",
+                labelType: "Problem Type", labelDiff: "Difficulty", scoreTitle: "Score & Streak",
+                pts: "pts", streak: "streak",
+                typeAll: "All Types (Mixed)", typePart: "Calculate Percentage Value",
+                typeBase: "Calculate Base (100%)", typeRate: "Calculate Percentage Rate (%)",
+                typeCompound: "Compound Changes (Increase / Decrease)",
+                diffEasy: "Easy (Basic 10%, 20%, 50%)", diffMedium: "Medium (Standard Percentages)", diffHard: "Hard (Advanced Problems)",
+                btnNewProblem: "Next Problem", btnCheck: "Check Answer", btnSolved: "Solved ✓", btnHint: "Hint",
+                hintHeading: "Calculation Hint:", solutionHeading: "Step-by-Step Solution:", inputPlaceholder: "Enter answer...",
+                wsCount: "Problem Count", wsDiff: "Difficulty", btnWsGenerate: "Generate", btnWsPrint: "Print",
+                wsShowKeys: "Show answer key at the end", wsHeaderTitle: "Worksheet: Percentages",
+                wsLabelName: "Name:", wsLabelClass: "Class:", wsLabelDate: "Date:", wsKeyTitle: "Answer Key",
+                modalStuTitle: "Student Identification", modalStuSub: "Enter your details for statistics",
+                modalLblName: "Full Name *", modalLblClass: "Class / Grade *", modalBtnSave: "Save & Continue",
+                modalFinTitle: "Results Summary", thDiff: "Difficulty", thAttempts: "Attempts", thCorrect: "Correct", thAcc: "Accuracy",
+                totalScoreLabel: "Total Score:", btnSendEmail: "Email Results to Teacher", btnCopyStats: "Copy Results to Clipboard",
+                correctMsg: "Great job! Your answer is correct. (+10 pts)",
+                incorrectMsg: "Unfortunately, that is incorrect. Try again or check the hint.",
+                alreadySolvedMsg: "You have already solved this problem. Click 'Next Problem'.",
+                copiedMsg: "Results copied to clipboard successfully!"
+            },
+            tl: {
+                title: "Mga Problema sa Porsyento", subtitle: "Pagsasanay at Tagagawa ng Papel-Pagsasanay",
+                saveApp: "I-save ang App", finish: "Tapusin at Ipadala",
+                tabPractice: "Interaktibong Pagsasanay", tabWorksheet: "Limbaging Papel-Pagsasanay",
+                labelType: "Uri ng Problema", labelDiff: "Antas ng Hirap", scoreTitle: "Iskor at Sunod-sunod",
+                pts: "puntos", streak: "sulat",
+                typeAll: "Lahat ng Uri (Halu-halo)", typePart: "Kwentahin ang Halaga ng Porsyento",
+                typeBase: "Kwentahin ang Batayan (100%)", typeRate: "Kwentahin ang Bahagdan (%)",
+                typeCompound: "Kombinasyong Pagbabago (Pagtaas / Pagbaba)",
+                diffEasy: "Madali (Pangunahing 10%, 20%, 50%)", diffMedium: "Katamtaman (Karaniwang Porsyento)", diffHard: "Mahirap (Mas Complex na Problema)",
+                btnNewProblem: "Susunod na Problema", btnCheck: "Suriin ang Sagot", btnSolved: "Nalutas Na ✓", btnHint: "Pahiwatig",
+                hintHeading: "Pahiwatig sa Pagkuwenta:", solutionHeading: "Dahap-dahap na Solusyon:", inputPlaceholder: "Ilagay ang sagot...",
+                wsCount: "Bilang ng Problema", wsDiff: "Antas ng Hirap", btnWsGenerate: "Gumawa", btnWsPrint: "I-print",
+                wsShowKeys: "Ipakita ang susi sa sagot sa dulo", wsHeaderTitle: "Papel-Pagsasanay: Porsyento",
+                wsLabelName: "Pangalan:", wsLabelClass: "Baitang/Seksiyon:", wsLabelDate: "Petsa:", wsKeyTitle: "Susi sa mga Sagot",
+                modalStuTitle: "Impormasyon ng Mag-aaral", modalStuSub: "Ilagay ang detalye para sa marka",
+                modalLblName: "Buong Pangalan *", modalLblClass: "Baitang / Seksiyon *", modalBtnSave: "I-save at Magpatuloy",
+                modalFinTitle: "Buod ng Resulta", thDiff: "Hirap", thAttempts: "Subok", thCorrect: "Tama", thAcc: "Kaastuhan",
+                totalScoreLabel: "Kabuong Iskor:", btnSendEmail: "Ipadala ang Resulta sa Guro", btnCopyStats: "Kopyahin ang Resulta sa Clipboard",
+                correctMsg: "Magaling! Tama ang iyong sagot. (+10 puntos)",
+                incorrectMsg: "Mali ang sagot. Subukang muli o tingnan ang pahiwatig.",
+                alreadySolvedMsg: "Nalutas mo na ang problemang ito. I-click ang 'Susunod na Problema'.",
+                copiedMsg: "Matagumpay na nakopya ang resulta!"
+            }
+        };
+
+        var ENTITIES = {
+            students: { isDiscrete: true, units: { cs: "žáků", uk: "учнів", en: "students", tl: "mag-aaral" } },
+            spectators: { isDiscrete: true, units: { cs: "diváků", uk: "глядачів", en: "spectators", tl: "mga nanood" } },
+            trees: { isDiscrete: true, units: { cs: "stromů", uk: "дерев", en: "trees", tl: "mga puno" } },
+            books: { isDiscrete: true, units: { cs: "knih", uk: "книг", en: "books", tl: "mga libro" } },
+            cars: { isDiscrete: true, units: { cs: "aut", uk: "автомобілів", en: "cars", tl: "mga kotse" } },
+            animals: { isDiscrete: true, units: { cs: "zvířat", uk: "тварин", en: "animals", tl: "mga hayop" } },
+            money: { isDiscrete: false, units: { cs: "Kč", uk: "грн", en: "USD", tl: "PHP" } },
+            weight: { isDiscrete: false, units: { cs: "kg", uk: "кг", en: "kg", tl: "kg" } }
+        };
+
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function gcd(a, b) {
+            return b === 0 ? a : gcd(b, a % b);
+        }
+
+        function generateProblemData(type, difficulty) {
+            if (type === 'all') {
+                var types = ['part', 'base', 'rate', 'compound'];
+                type = types[Math.floor(Math.random() * types.length)];
+            }
+
+            var entityKeys = Object.keys(ENTITIES);
+            var entityKey = entityKeys[Math.floor(Math.random() * entityKeys.length)];
+            var entity = ENTITIES[entityKey];
+
+            var percentRate, base, part, finalValue, changeType;
+
+            if (entity.isDiscrete) {
+                if (difficulty === 'easy') {
+                    var easyRates = [10, 20, 25, 50];
+                    percentRate = easyRates[Math.floor(Math.random() * easyRates.length)];
+                    var multiplier = getRandomInt(2, 15);
+                    base = (100 / gcd(100, percentRate)) * multiplier;
+                } else if (difficulty === 'medium') {
+                    var validRates = [5, 10, 12, 15, 20, 25, 30, 40, 50, 60, 75];
+                    percentRate = validRates[Math.floor(Math.random() * validRates.length)];
+                    var multiplier2 = getRandomInt(3, 20);
+                    base = (100 / gcd(100, percentRate)) * multiplier2;
+                } else {
+                    percentRate = getRandomInt(4, 95);
+                    var step = 100 / gcd(100, percentRate);
+                    var multiplier3 = getRandomInt(4, 25);
+                    base = step * multiplier3;
+                }
+                part = Math.round((base * percentRate) / 100);
+
+                if (type === 'compound') {
+                    changeType = Math.random() > 0.5 ? 'increase' : 'decrease';
+                    finalValue = changeType === 'increase' ? base + part : (base > part ? base - part : base + part);
+                    if (base <= part) changeType = 'increase';
+                }
+            } else {
+                if (difficulty === 'easy') {
+                    percentRate = [10, 20, 25, 50][Math.floor(Math.random() * 4)];
+                    base = getRandomInt(1, 20) * 100;
+                    part = (base * percentRate) / 100;
+                } else if (difficulty === 'medium') {
+                    percentRate = getRandomInt(1, 18) * 5;
+                    base = getRandomInt(5, 100) * 10;
+                    part = (base * percentRate) / 100;
+                } else {
+                    percentRate = getRandomInt(3, 85);
+                    base = getRandomInt(150, 3000);
+                    part = Number(((base * percentRate) / 100).toFixed(2));
+                }
+
+                if (type === 'compound') {
+                    changeType = Math.random() > 0.5 ? 'increase' : 'decrease';
+                    finalValue = changeType === 'increase' 
+                        ? Number((base + part).toFixed(2)) 
+                        : Number((base - part).toFixed(2));
+                }
+            }
+
+            return {
+                id: Date.now() + Math.random(),
+                type: type,
+                difficulty: difficulty,
+                entityKey: entityKey,
+                isDiscrete: entity.isDiscrete,
+                percentRate: percentRate,
+                base: base,
+                part: part,
+                finalValue: finalValue,
+                changeType: changeType,
+                solved: false
+            };
+        }
+
+        function buildProblemText(prob, lang) {
+            var unit = ENTITIES[prob.entityKey].units[lang];
+            var p = prob.percentRate;
+            var z = prob.base;
+            var w = prob.part;
+
+            if (lang === 'cs') {
+                if (prob.type === 'part') {
+                    switch (prob.entityKey) {
+                        case 'students': return 'Ve škole je celkem ' + z + ' žáků. Z nich ' + p + ' % navštěvuje kroužek. Kolik žáků navštěvuje kroužek?';
+                        case 'spectators': return 'Na stadion přišlo ' + z + ' diváků. ' + p + ' % z nich fandilo hostům. Kolik diváků fandilo hostům?';
+                        case 'trees': return 'V parku roste celkem ' + z + ' stromů. ' + p + ' % tvoří duby. Kolik dubů roste v parku?';
+                        case 'books': return 'Knihovna má ' + z + ' knih. ' + p + ' % je cizojazyčných. Kolik cizojazyčných knih je v knihovně?';
+                        case 'cars': return 'Na parkovišti stojí ' + z + ' aut. ' + p + ' % má bílou barvu. Kolik bílých aut tam stojí?';
+                        case 'animals': return 'V zoo mají ' + z + ' zvířat. ' + p + ' % tvoří vzácné druhy. Kolik je to zvířat?';
+                        case 'money': return 'Mobil stál původně ' + z + ' Kč. V obchodě poskytli slevu ' + p + ' %. Kolik Kč činila sleva?';
+                        default: return 'Z celkového množství ' + z + ' ' + unit + ' tvoří vybraná část ' + p + ' %. Kolik je to ' + unit + '?';
+                    }
+                } else if (prob.type === 'base') {
+                    return 'Určete základ (100 %), jestliže ' + p + ' % z tohoto základu je právě ' + w + ' ' + unit + '.';
+                } else if (prob.type === 'rate') {
+                    return 'Z celkového počtu ' + z + ' ' + unit + ' tvoří vybraná skupina ' + w + ' ' + unit + '. Kolik je to procent?';
+                } else {
+                    return 'Původní hodnota ' + z + ' ' + unit + ' byla ' + (prob.changeType === 'increase' ? 'zvýšena' : 'zlevněna') + ' o ' + p + ' %. Jaká je nová hodnota?';
+                }
+            } else if (lang === 'uk') {
+                if (prob.type === 'part') return 'Загальна кількість ' + z + ' ' + unit + '. З них ' + p + ' % у групі. Скільки це ' + unit + '?';
+                if (prob.type === 'base') return 'Знайдіть основу (100 %), якщо ' + p + ' % від неї дорівнює ' + w + ' ' + unit + '.';
+                if (prob.type === 'rate') return 'З кількості ' + z + ' ' + unit + ' група складає ' + w + ' ' + unit + '. Скільки це відсотків?';
+                return 'Початкове значення ' + z + ' ' + unit + ' було ' + (prob.changeType === 'increase' ? 'збільшено' : 'зменшено') + ' на ' + p + ' %. Яке нове значення?';
+            } else if (lang === 'en') {
+                if (prob.type === 'part') return 'Out of a total of ' + z + ' ' + unit + ', ' + p + '% belong to a group. How many ' + unit + ' is that?';
+                if (prob.type === 'base') return 'Find the base (100%) if ' + p + '% of it equals ' + w + ' ' + unit + '.';
+                if (prob.type === 'rate') return 'Out of ' + z + ' ' + unit + ', ' + w + ' ' + unit + ' meet criteria. What percentage is this?';
+                return 'An amount of ' + z + ' ' + unit + ' was ' + (prob.changeType === 'increase' ? 'increased' : 'decreased') + ' by ' + p + '%. What is the new value?';
+            } else {
+                if (prob.type === 'part') return 'Sa kabuuang ' + z + ' ' + unit + ', ' + p + '% ang nasa grupo. Ilang ' + unit + ' ito?';
+                if (prob.type === 'base') return 'Hanapin ang kabuuan (100%) kung ang ' + p + '% nito ay ' + w + ' ' + unit + '.';
+                if (prob.type === 'rate') return 'Sa ' + z + ' ' + unit + ', ang ' + w + ' ' + unit + ' ay tumutugma. Ilang porsyento ito?';
+                return 'Ang ' + z + ' ' + unit + ' ay ' + (prob.changeType === 'increase' ? 'itaas' : 'ibinaba') + ' ng ' + p + '%. Ano ang bagong halaga?';
+            }
+        }
+
+        function getExpectedAnswer(prob) {
+            if (prob.type === 'part') return prob.part;
+            if (prob.type === 'base') return prob.base;
+            if (prob.type === 'rate') return prob.percentRate;
+            return prob.finalValue;
+        }
+
+        function getExpectedUnit(prob, lang) {
+            if (prob.type === 'rate') return '%';
+            return ENTITIES[prob.entityKey].units[lang];
+        }
+
+        function buildHint(prob, lang) {
+            if (prob.type === 'part') {
+                return '1 % = ' + prob.base + ' ÷ 100 = ' + (prob.base / 100).toFixed(2) + '. Vynásobte počtem procent (' + prob.percentRate + ').';
+            } else if (prob.type === 'base') {
+                return '1 % = ' + prob.part + ' ÷ ' + prob.percentRate + ' = ' + (prob.part / prob.percentRate).toFixed(2) + '. Základ (100 %) = vynásobit 100.';
+            } else if (prob.type === 'rate') {
+                return 'Podělte část základem: (' + prob.part + ' ÷ ' + prob.base + ') a vynásobte 100.';
+            } else {
+                return 'Vypočítejte změnu (' + prob.percentRate + ' % z ' + prob.base + ') a ' + (prob.changeType === 'increase' ? 'přičtěte k' : 'odečtěte od') + ' základu.';
+            }
+        }
+
+        function buildSolutionSteps(prob, lang) {
+            var steps = [];
+            var unit = getExpectedUnit(prob, lang);
+            if (prob.type === 'part') {
+                steps.push('1) Základ (100 %) = ' + prob.base);
+                steps.push('2) 1 % = ' + prob.base + ' ÷ 100 = ' + (prob.base / 100));
+                steps.push('3) ' + prob.percentRate + ' % = ' + (prob.base / 100) + ' × ' + prob.percentRate + ' = ' + prob.part + ' ' + unit);
+            } else if (prob.type === 'base') {
+                steps.push('1) ' + prob.percentRate + ' % = ' + prob.part);
+                steps.push('2) 1 % = ' + prob.part + ' ÷ ' + prob.percentRate + ' = ' + (prob.part / prob.percentRate));
+                steps.push('3) Základ (100 %) = ' + (prob.part / prob.percentRate) + ' × 100 = ' + prob.base + ' ' + unit);
+            } else if (prob.type === 'rate') {
+                steps.push('1) Podíl: ' + prob.part + ' ÷ ' + prob.base + ' = ' + (prob.part / prob.base).toFixed(4));
+                steps.push('2) Převod na procenta: ' + (prob.part / prob.base).toFixed(4) + ' × 100 = ' + prob.percentRate + ' %');
+            } else {
+                steps.push('1) Změna (' + prob.percentRate + ' % z ' + prob.base + ') = ' + prob.part);
+                steps.push('2) Výsledek: ' + prob.base + ' ' + (prob.changeType === 'increase' ? '+' : '-') + ' ' + prob.part + ' = ' + prob.finalValue + ' ' + unit);
+            }
+            return steps;
+        }
+
+        function setLanguage(lang) {
+            STATE.lang = lang;
+            updateLanguageUI();
+            if (STATE.currentProblem) renderCurrentProblem();
+            if (STATE.mode === 'worksheet') generateWorksheet();
+        }
+
+        function updateLanguageUI() {
+            var t = TRANSLATIONS[STATE.lang];
+            document.getElementById('ui-title').innerText = t.title;
+            document.getElementById('ui-subtitle').innerText = t.subtitle;
+            document.getElementById('ui-btn-save-app').innerText = t.saveApp;
+            document.getElementById('ui-btn-finish').innerText = t.finish;
+            document.getElementById('ui-tab-practice').innerText = t.tabPractice;
+            document.getElementById('ui-tab-worksheet').innerText = t.tabWorksheet;
+            document.getElementById('ui-label-type').innerText = t.labelType;
+            document.getElementById('ui-label-diff').innerText = t.labelDiff;
+            document.getElementById('ui-score-title').innerText = t.scoreTitle;
+            document.getElementById('ui-pts').innerText = t.pts;
+            document.getElementById('ui-streak').innerText = t.streak;
+
+            document.getElementById('opt-type-all').innerText = t.typeAll;
+            document.getElementById('opt-type-part').innerText = t.typePart;
+            document.getElementById('opt-type-base').innerText = t.typeBase;
+            document.getElementById('opt-type-rate').innerText = t.typeRate;
+            document.getElementById('opt-type-compound').innerText = t.typeCompound;
+
+            document.getElementById('opt-diff-easy').innerText = t.diffEasy;
+            document.getElementById('opt-diff-medium').innerText = t.diffMedium;
+            document.getElementById('opt-diff-hard').innerText = t.diffHard;
+
+            document.getElementById('ui-btn-new-problem').innerText = t.btnNewProblem;
+            document.getElementById('ui-btn-hint').innerText = t.btnHint;
+            document.getElementById('ui-hint-heading').innerText = t.hintHeading;
+            document.getElementById('ui-solution-heading').innerText = t.solutionHeading;
+
+            document.getElementById('input-answer').placeholder = t.inputPlaceholder;
+
+            document.getElementById('ui-ws-count').innerText = t.wsCount;
+            document.getElementById('ui-ws-diff').innerText = t.wsDiff;
+            document.getElementById('ui-btn-ws-generate').innerText = t.btnWsGenerate;
+            document.getElementById('ui-btn-ws-print').innerText = t.btnWsPrint;
+            document.getElementById('ui-ws-show-keys').innerText = t.wsShowKeys;
+            document.getElementById('ui-ws-header-title').innerText = t.wsHeaderTitle;
+            document.getElementById('ui-ws-label-name').innerText = t.wsLabelName;
+            document.getElementById('ui-ws-label-class').innerText = t.wsLabelClass;
+            document.getElementById('ui-ws-label-date').innerText = t.wsLabelDate;
+            document.getElementById('ui-ws-key-title').innerText = t.wsKeyTitle;
+
+            document.getElementById('ui-modal-stu-title').innerText = t.modalStuTitle;
+            document.getElementById('ui-modal-stu-sub').innerText = t.modalStuSub;
+            document.getElementById('ui-modal-lbl-name').innerText = t.modalLblName;
+            document.getElementById('ui-modal-lbl-class').innerText = t.modalLblClass;
+            document.getElementById('ui-modal-btn-save').innerText = t.modalBtnSave;
+
+            document.getElementById('ui-modal-fin-title').innerText = t.modalFinTitle;
+            document.getElementById('ui-th-diff').innerText = t.thDiff;
+            document.getElementById('ui-th-attempts').innerText = t.thAttempts;
+            document.getElementById('ui-th-correct').innerText = t.thCorrect;
+            document.getElementById('ui-th-acc').innerText = t.thAcc;
+            document.getElementById('ui-total-score-label').innerText = t.totalScoreLabel;
+            document.getElementById('ui-btn-send-email').innerText = t.btnSendEmail;
+            document.getElementById('ui-btn-copy-stats').innerText = t.btnCopyStats;
+
+            var langBtns = document.querySelectorAll('.lang-btn');
+            for (var i = 0; i < langBtns.length; i++) {
+                langBtns[i].classList.remove('active');
+            }
+            var activeBtn = document.getElementById('lang-btn-' + STATE.lang);
+            if (activeBtn) activeBtn.classList.add('active');
+
+            var checkBtnText = document.getElementById('ui-btn-check');
+            if (STATE.currentProblem && STATE.currentProblem.solved) {
+                checkBtnText.innerText = t.btnSolved;
+            } else {
+                checkBtnText.innerText = t.btnCheck;
+            }
+        }
+
+        function generateNewProblem() {
+            var type = document.getElementById('select-problem-type').value;
+            var diff = document.getElementById('select-difficulty').value;
+
+            STATE.currentProblem = generateProblemData(type, diff);
+            renderCurrentProblem();
+        }
+
+        function renderCurrentProblem() {
+            var prob = STATE.currentProblem;
+            var t = TRANSLATIONS[STATE.lang];
+
+            document.getElementById('problem-text').innerText = buildProblemText(prob, STATE.lang);
+            document.getElementById('input-unit').innerText = getExpectedUnit(prob, STATE.lang);
+
+            document.getElementById('badge-difficulty').innerText = prob.difficulty.toUpperCase();
+            document.getElementById('badge-type').innerText = prob.type.toUpperCase();
+
+            var inputEl = document.getElementById('input-answer');
+            var checkBtn = document.getElementById('btn-check');
+
+            inputEl.value = '';
+            inputEl.disabled = false;
+
+            if (prob.solved) {
+                checkBtn.disabled = true;
+                checkBtn.className = "btn btn-success";
+                document.getElementById('ui-btn-check').innerText = t.btnSolved;
+            } else {
+                checkBtn.disabled = false;
+                checkBtn.className = "btn btn-primary";
+                document.getElementById('ui-btn-check').innerText = t.btnCheck;
+            }
+
+            document.getElementById('hint-box').style.display = 'none';
+            document.getElementById('solution-box').style.display = 'none';
+            
+            var feedbackBox = document.getElementById('feedback-box');
+            feedbackBox.style.display = 'none';
+        }
+
+        function handleFormSubmit(e) {
+            if (e && e.preventDefault) e.preventDefault();
+            checkAnswer();
+            return false;
+        }
+
+        function checkAnswer() {
+            var prob = STATE.currentProblem;
+            var t = TRANSLATIONS[STATE.lang];
+            var feedbackBox = document.getElementById('feedback-box');
+            var checkBtn = document.getElementById('btn-check');
+
+            if (prob.solved) {
+                feedbackBox.innerText = t.alreadySolvedMsg;
+                feedbackBox.className = "alert alert-warning";
+                feedbackBox.style.display = 'block';
+                return;
+            }
+
+            var rawInput = document.getElementById('input-answer').value.trim().replace(',', '.');
+            var userNum = parseFloat(rawInput);
+            var expectedNum = getExpectedAnswer(prob);
+
+            if (isNaN(userNum)) {
+                feedbackBox.innerText = "Zadejte platné číslo!";
+                feedbackBox.className = "alert alert-danger";
+                feedbackBox.style.display = 'block';
+                return;
+            }
+
+            STATE.stats[prob.difficulty].attempts++;
+            var isCorrect = Math.abs(userNum - expectedNum) < 0.05;
+
+            if (isCorrect) {
+                prob.solved = true;
+                STATE.score += 10;
+                STATE.streak++;
+                STATE.stats[prob.difficulty].correct++;
+
+                checkBtn.disabled = true;
+                checkBtn.className = "btn btn-success";
+                document.getElementById('ui-btn-check').innerText = t.btnSolved;
+
+                feedbackBox.innerText = t.correctMsg;
+                feedbackBox.className = "alert alert-success";
+                feedbackBox.style.display = 'block';
+
+                showSolution();
+            } else {
+                STATE.streak = 0;
+                feedbackBox.innerText = t.incorrectMsg;
+                feedbackBox.className = "alert alert-danger";
+                feedbackBox.style.display = 'block';
+            }
+
+            updateScoreboard();
+        }
+
+        function updateScoreboard() {
+            document.getElementById('stat-score').innerText = STATE.score;
+            document.getElementById('stat-streak').innerText = STATE.streak;
+            var progressPercent = Math.min(100, (STATE.streak / 10) * 100);
+            document.getElementById('stat-progress-bar').style.width = progressPercent + '%';
+        }
+
+        function toggleHint() {
+            var hintBox = document.getElementById('hint-box');
+            if (hintBox.style.display === 'block') {
+                hintBox.style.display = 'none';
+            } else {
+                document.getElementById('hint-text').innerText = buildHint(STATE.currentProblem, STATE.lang);
+                hintBox.style.display = 'block';
+            }
+        }
+
+        function showSolution() {
+            var solutionBox = document.getElementById('solution-box');
+            var solutionSteps = document.getElementById('solution-steps');
+            var steps = buildSolutionSteps(STATE.currentProblem, STATE.lang);
+
+            var html = '';
+            for (var i = 0; i < steps.length; i++) {
+                html += '<div class="step-item">' + steps[i] + '</div>';
+            }
+            solutionSteps.innerHTML = html;
+            solutionBox.style.display = 'block';
+        }
+
+        function switchMode(mode) {
+            STATE.mode = mode;
+            var tabPractice = document.getElementById('tab-practice');
+            var tabWorksheet = document.getElementById('tab-worksheet');
+            var modePractice = document.getElementById('mode-practice');
+            var modeWorksheet = document.getElementById('mode-worksheet');
+
+            if (mode === 'practice') {
+                tabPractice.classList.add('active');
+                tabWorksheet.classList.remove('active');
+                modePractice.classList.remove('hidden');
+                modeWorksheet.classList.add('hidden');
+            } else {
+                tabWorksheet.classList.add('active');
+                tabPractice.classList.remove('active');
+                modeWorksheet.classList.remove('hidden');
+                modePractice.classList.add('hidden');
+                generateWorksheet();
+            }
+        }
+
+        function generateWorksheet() {
+            var count = parseInt(document.getElementById('select-ws-count').value, 10);
+            var diffSetting = document.getElementById('select-ws-diff').value;
+
+            STATE.worksheetData = [];
+            var listContainer = document.getElementById('worksheet-list');
+            var answersContainer = document.getElementById('worksheet-answers-list');
+
+            listContainer.innerHTML = '';
+            answersContainer.innerHTML = '';
+
+            document.getElementById('ws-date').innerText = new Date().toLocaleDateString(STATE.lang === 'cs' ? 'cs-CZ' : 'en-US');
+
+            for (var i = 0; i < count; i++) {
+                var diff = diffSetting === 'mixed' ? ['easy', 'medium', 'hard'][i % 3] : diffSetting;
+                var prob = generateProblemData('all', diff);
+                STATE.worksheetData.push(prob);
+
+                var text = buildProblemText(prob, STATE.lang);
+                var unit = getExpectedUnit(prob, STATE.lang);
+                var ans = getExpectedAnswer(prob);
+
+                var probEl = document.createElement('div');
+                probEl.className = "ws-problem-item";
+                probEl.innerHTML = '<div style="font-weight: 600;"><strong style="color: var(--primary);">' + (i + 1) + '.</strong> ' + text + '</div>' +
+                    '<div class="ws-answer-line">Odpověď: ____________________ ' + unit + '</div>';
+                listContainer.appendChild(probEl);
+
+                var ansEl = document.createElement('div');
+                ansEl.style.padding = "6px";
+                ansEl.style.background = "#f1f5f9";
+                ansEl.style.borderRadius = "4px";
+                ansEl.innerHTML = '<strong>' + (i + 1) + ':</strong> ' + ans + ' ' + unit;
+                answersContainer.appendChild(ansEl);
+            }
+        }
+
+        function toggleWorksheetAnswers() {
+            var show = document.getElementById('check-show-answers').checked;
+            document.getElementById('worksheet-answers').className = show ? "" : "hidden";
+        }
+
+        function openStudentModal() {
+            document.getElementById('input-student-name').value = STATE.student.name;
+            document.getElementById('input-student-class').value = STATE.student.class;
+            document.getElementById('modal-student').classList.remove('hidden');
+        }
+
+        function saveStudentInfo(e) {
+            if (e && e.preventDefault) e.preventDefault();
+            var name = document.getElementById('input-student-name').value.trim();
+            var cls = document.getElementById('input-student-class').value.trim();
+
+            if (name && cls) {
+                STATE.student.name = name;
+                STATE.student.class = cls;
+
+                safeSetStorage('pct_student_name', name);
+                safeSetStorage('pct_student_class', cls);
+
+                updateStudentDisplay();
+                document.getElementById('modal-student').classList.add('hidden');
+            }
+            return false;
+        }
+
+        function updateStudentDisplay() {
+            var displayStr = STATE.student.name ? (STATE.student.name + ' (' + STATE.student.class + ')') : 'Žák: ---';
+            document.getElementById('nav-student-name').innerText = displayStr;
+            document.getElementById('ws-student-name').innerText = STATE.student.name || '________________';
+            document.getElementById('ws-student-class').innerText = STATE.student.class || '________';
+            document.getElementById('modal-fin-student-info').innerText = 'Žák: ' + displayStr;
+        }
+
+        function openFinishModal() {
+            updateStudentDisplay();
+            var tbody = document.getElementById('stats-table-body');
+            tbody.innerHTML = '';
+
+            var diffs = ['easy', 'medium', 'hard'];
+            for (var i = 0; i < diffs.length; i++) {
+                var d = diffs[i];
+                var stat = STATE.stats[d];
+                var acc = stat.attempts > 0 ? Math.round((stat.correct / stat.attempts) * 100) : 0;
+                var tr = document.createElement('tr');
+                tr.innerHTML = '<td style="font-weight: 700; text-transform: capitalize;">' + d + '</td>' +
+                    '<td>' + stat.attempts + '</td>' +
+                    '<td style="color: var(--success); font-weight: 700;">' + stat.correct + '</td>' +
+                    '<td style="font-weight: 700;">' + acc + ' %</td>';
+                tbody.appendChild(tr);
+            }
+
+            document.getElementById('final-total-score').innerText = STATE.score + ' bodů';
+            document.getElementById('modal-finish').classList.remove('hidden');
+        }
+
+        function closeFinishModal() {
+            document.getElementById('modal-finish').classList.add('hidden');
+        }
+
+        function generateSummaryText() {
+            var stu = STATE.student.name ? (STATE.student.name + ' (' + STATE.student.class + ')') : 'Nespecifikovaný žák';
+            var summary = "VÝSLEDKY MATEMATICKÉHO TESTU - PROCENTA\n----------------------------------------\n";
+            summary += "Žák: " + stu + "\nDatum: " + new Date().toLocaleString() + "\nCelkové skóre: " + STATE.score + " bodů\n\nSTATISTIKA PODLE OBTÍŽNOSTI:\n";
+            
+            var diffs = ['easy', 'medium', 'hard'];
+            for (var i = 0; i < diffs.length; i++) {
+                var d = diffs[i];
+                var s = STATE.stats[d];
+                var acc = s.attempts > 0 ? Math.round((s.correct / s.attempts) * 100) : 0;
+                summary += "- " + d.toUpperCase() + ": " + s.correct + "/" + s.attempts + " správně (" + acc + "% úspěšnost)\n";
+            }
+            return summary;
+        }
+
+        function sendMailToTeacher() {
+            var teacherEmail = "novotny@zsgajdosova.cz";
+            var subject = encodeURIComponent("Výsledky procenta - " + (STATE.student.name || 'Žák'));
+            var body = encodeURIComponent(generateSummaryText());
+            window.location.href = "mailto:" + teacherEmail + "?subject=" + subject + "&body=" + body;
+        }
+
+        function copyResultsToClipboard() {
+            var text = generateSummaryText();
+            var textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                alert(TRANSLATIONS[STATE.lang].copiedMsg);
+            } catch (err) {}
+            document.body.removeChild(textarea);
+        }
+
+        function downloadAppHtml() {
+            try {
+                var htmlContent = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+                var blob = new Blob([htmlContent], { type: "text/html;charset=utf-8" });
+                var a = document.createElement("a");
+                a.href = URL.createObjectURL(blob);
+                a.download = "Generator_Slovnich_Uloh_Procenta.html";
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(a.href);
+            } catch(e) {
+                alert("Pro uložení aplikace použijte v prohlížeči nabídku Sdílet -> Uložit soubor.");
+            }
+        }
+
+        /* Immediate Synchronous Initialization (Bypasses window.onload delays/failures on iOS WebViews) */
+        (function initAppNow() {
+            try {
+                var savedName = safeGetStorage('pct_student_name');
+                var savedClass = safeGetStorage('pct_student_class');
+
+                if (savedName && savedClass) {
+                    STATE.student.name = savedName;
+                    STATE.student.class = savedClass;
+                    updateStudentDisplay();
+                } else {
+                    openStudentModal();
+                }
+
+                updateLanguageUI();
+                generateNewProblem();
+            } catch (err) {
+                // Guaranteed fallback in case of any initial rendering error
+                if (!STATE.currentProblem) {
+                    generateNewProblem();
+                }
+            }
+        })();
+    </script>
+</body>
+</html>
